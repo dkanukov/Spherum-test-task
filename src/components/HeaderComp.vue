@@ -10,7 +10,7 @@
         </v-col>
         <v-spacer/>
         <v-col class="v-col-5 v-col-md-3 v-col-lg-3">
-          <h3>Баланс: {{}}</h3>
+          <h3>Баланс: {{balance}}</h3>
         </v-col>
       </v-row>
     </v-container>
@@ -20,7 +20,12 @@
 
 <script>
 export default {
-  name: "HeaderComp"
+  name: "HeaderComp",
+  data() {
+    return {
+      balance: 900
+    }
+  },
 }
 </script>
 

@@ -7,7 +7,12 @@
         <v-col class="v-col-6">
           <v-row class="justify-sm-space-between">
             <v-col class="align-self-center v-col-xs-4 v-col-sm-5 v-col-md-4 v-col-lg-4">
-              <h3 class="pb-5 sort__btn">Сортировка цен</h3>
+              <h3
+                class="pb-5 sort__btn"
+                @click="sortByPrice"
+              >
+                Сортировка цен
+              </h3>
             </v-col>
             <v-col class="align-self-center v-col-5 v-col-sm-5">
               <v-select
@@ -26,12 +31,19 @@
           </v-row>
           <v-row>
             <v-col
-              class="mt-5"
+              class="mt-5 v-col-12 v-col-lg-6"
               v-for="book in defaultData"
               cols="6"
               :key="book"
             >
-              <card-comp/>
+              <card-comp
+                  :name = book.name
+                  :author-name = book.authorName
+                  :price = book.price
+                  :cover-url = book.coverUrl
+                  :category-id = book.categoryId
+
+              />
             </v-col>
           </v-row>
         </v-col>
@@ -58,7 +70,9 @@ export default {
   data() {
     return {
       defaultData: [],
-      bookCategories: ["Дизайн", "Управление проектами", "Разработка", "Тестирование"]
+      booksDefaultData: [],
+      bookCategories: [],
+      sortedBooks: []
     }
   },
   methods: {
@@ -71,11 +85,33 @@ export default {
         body: '{"filters": {}}'
       });
       this.defaultData = await responce.json();
-      console.log(this.defaultData);
+    },
+    async fetchCategories() {
+      const responce = await fetch("http://45.8.249.57/bookstore-api/books/categories", {
+        method: "GET"
+      });
+      this.booksDefaultData = await responce.json();
+      for (let i = 0; i < this.booksDefaultData.length; i++) {
+        this.bookCategories[i] = this.booksDefaultData[i].name;
+      }
+    },
+    async sortByPrice() {
+      const responce = await fetch("http://45.8.249.57/bookstore-api/books", {
+        headers: {
+          "Content-Type": "application/json"
+        },
+        method: "POST",
+        body: '{"filters": {' +
+            '"search": "",' +
+            '"sortPrice": "DESC"}}'
+      });
+      this.sortedBooks = await responce.json();
+      console.log(this.sortedBooks)
     }
   },
   mounted() {
     this.fetchBooks();
+    this.fetchCategories();
   }
 }
 </script>
@@ -89,7 +125,7 @@ export default {
   .sort__btn::after {
     position: absolute;
     content: "";
-    bottom: 0px;
+    bottom: 0;
     width: 40px;
     height: 40px;
     background-image: url(../assets/arrows.svg);
@@ -104,7 +140,7 @@ export default {
   .books__list::after {
     position: absolute;
     content: "";
-    bottom: 0px;
+    bottom: 0;
     width: 40px;
     height: 40px;
     background-image: url(../assets/bucket.svg);
@@ -118,7 +154,6 @@ export default {
   .search__field::before {
     position: absolute;
     content: "";
-    bottom: 0px;
     width: 40px;
     height: 40px;
     background-image: url(../assets/mirror.svg);

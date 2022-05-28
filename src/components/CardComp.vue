@@ -1,26 +1,47 @@
 <template>
   <v-card
+      min-width="260px"
       elevation="2"
   >
       <v-row>
         <v-col class="v-col-4">
-
+          <v-img
+              :lazy-src="coverUrl"
+              height="200"
+              width="150"
+              :src="coverUrl"
+          ></v-img>
         </v-col>
         <v-col class="v-col-8">
           <v-row>
-            <v-card-title>
-              Название книги
-            </v-card-title>
+            <v-col>
+              <v-card-title style="overflow-y: auto; overflow-x: auto; height:100px">
+                <p>{{name}}</p>
+              </v-card-title>
+            </v-col>
+
           </v-row>
           <v-row>
-            <v-card-text>
-              Цена
-            </v-card-text>
-            <v-card-actions>
-              <v-btn>
+            <v-col
+                class="align-self-center"
+                col="3"
+            >
+              <v-card-text>
+                {{price}} руб
+              </v-card-text>
+            </v-col>
+            <v-col
+                class="align-self-center"
+            >
+              <v-btn
+                  class=""
+                  elevation="2"
+                  color="primary"
+                  size="small"
+              >
                 В корзину
               </v-btn>
-            </v-card-actions>
+            </v-col>
           </v-row>
         </v-col>
       </v-row>
@@ -29,7 +50,14 @@
 
 <script>
 export default {
-  name: "CardComp"
+  name: "CardComp",
+  props: {
+    name: String,
+    authorName: String,
+    price: Number,
+    coverUrl: String,
+    categoryId: Number
+  }
 }
 </script>
 
