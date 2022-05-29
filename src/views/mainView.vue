@@ -9,7 +9,7 @@
             <v-col class="align-self-center v-col-xs-4 v-col-sm-5 v-col-md-4 v-col-lg-4">
               <h3
                 class="pb-5 sort__btn"
-                @click="sortByPrice"
+                @click="sortBooks(); toggleSortType()"
               >
                 Сортировка цен
               </h3>
@@ -26,6 +26,8 @@
             <v-col class="v-col-11">
             <v-text-field
                 class="search__field"
+                v-model.trim="searchInput"
+                @input="sortBooks"
             />
             </v-col>
           </v-row>
@@ -42,7 +44,6 @@
                   :price = book.price
                   :cover-url = book.coverUrl
                   :category-id = book.categoryId
-
               />
             </v-col>
           </v-row>
@@ -72,7 +73,10 @@ export default {
       defaultData: [],
       booksDefaultData: [],
       bookCategories: [],
-      sortedBooks: []
+      sortedBooks: [],
+      sortBy: "ASC",
+      searchInput: "",
+      chooseCategory: "",
     }
   },
   methods: {
@@ -82,31 +86,36 @@ export default {
           "Content-Type": "application/json"
         },
         method: "POST",
-        body: '{"filters": {}}'
+        body: '{"filters": {' +
+            '"sortPrice": "' + this.sortBy + '"}}'
       });
       this.defaultData = await responce.json();
+      this.toggleSortType();
     },
     async fetchCategories() {
       const responce = await fetch("http://45.8.249.57/bookstore-api/books/categories", {
-        method: "GET"
+        method: "GET",
       });
       this.booksDefaultData = await responce.json();
       for (let i = 0; i < this.booksDefaultData.length; i++) {
         this.bookCategories[i] = this.booksDefaultData[i].name;
       }
     },
-    async sortByPrice() {
+    async sortBooks() {
       const responce = await fetch("http://45.8.249.57/bookstore-api/books", {
         headers: {
           "Content-Type": "application/json"
         },
         method: "POST",
         body: '{"filters": {' +
-            '"search": "",' +
-            '"sortPrice": "DESC"}}'
+            '"search": "' + this.searchInput + '",' +
+            '"sortPrice": "' + this.sortBy + '"}}'
       });
       this.sortedBooks = await responce.json();
-      console.log(this.sortedBooks)
+      this.defaultData = this.sortedBooks;
+    },
+    toggleSortType() {
+      this.sortBy = this.sortBy === "DESC" ? "ASC" : "DESC";
     }
   },
   mounted() {

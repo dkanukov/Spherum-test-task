@@ -15,7 +15,7 @@
         <v-col class="v-col-8">
           <v-row>
             <v-col>
-              <v-card-title style="overflow-y: auto; overflow-x: auto; height:100px">
+              <v-card-title style="overflow-y: auto; overflow-x: auto; height:120px">
                 <p>{{name}}</p>
               </v-card-title>
             </v-col>
