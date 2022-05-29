@@ -9,15 +9,18 @@
             <v-col class="align-self-center v-col-xs-4 v-col-sm-5 v-col-md-4 v-col-lg-4">
               <h3
                 class="pb-5 sort__btn"
-                @click="sortBooks(); toggleSortType()"
+                @click="toggleSortType(); sortBooks()"
               >
                 Сортировка цен
               </h3>
             </v-col>
             <v-col class="align-self-center v-col-5 v-col-sm-5">
               <v-select
-                  :items="bookCategories"
+                  :items="booksDefaultCategories"
+                  item-title="name"
                   label="Категория"
+                  v-model="selectedCategory"
+                  return-object
               />
             </v-col>
           </v-row>
@@ -31,7 +34,7 @@
             />
             </v-col>
           </v-row>
-          <v-row>
+          <v-row v-if="defaultData.length !== 0">
             <v-col
               class="mt-5 v-col-12 v-col-lg-6"
               v-for="book in defaultData"
@@ -39,6 +42,7 @@
               :key="book"
             >
               <card-comp
+                  @addToCart="addToCartParent"
                   :name = book.name
                   :author-name = book.authorName
                   :price = book.price
@@ -46,6 +50,9 @@
                   :category-id = book.categoryId
               />
             </v-col>
+          </v-row>
+          <v-row v-else class="justify-center">
+            <h1>Мы не смогли ничего найти :(</h1>
           </v-row>
         </v-col>
 
@@ -71,12 +78,12 @@ export default {
   data() {
     return {
       defaultData: [],
-      booksDefaultData: [],
+      booksDefaultCategories: [],
       bookCategories: [],
       sortedBooks: [],
       sortBy: "ASC",
       searchInput: "",
-      chooseCategory: "",
+      selectedCategory: "",
     }
   },
   methods: {
@@ -90,18 +97,20 @@ export default {
             '"sortPrice": "' + this.sortBy + '"}}'
       });
       this.defaultData = await responce.json();
-      this.toggleSortType();
+      // this.toggleSortType();
     },
     async fetchCategories() {
       const responce = await fetch("http://45.8.249.57/bookstore-api/books/categories", {
         method: "GET",
       });
-      this.booksDefaultData = await responce.json();
-      for (let i = 0; i < this.booksDefaultData.length; i++) {
-        this.bookCategories[i] = this.booksDefaultData[i].name;
-      }
+      this.booksDefaultCategories = await responce.json();
     },
     async sortBooks() {
+      console.log(this.sortBy)
+      let selectedCategoryId = 0;
+      if (this.selectedCategory !== "") {
+        selectedCategoryId = this.booksDefaultCategories.find(category => category.name === this.selectedCategory).id;
+      }
       const responce = await fetch("http://45.8.249.57/bookstore-api/books", {
         headers: {
           "Content-Type": "application/json"
@@ -109,13 +118,23 @@ export default {
         method: "POST",
         body: '{"filters": {' +
             '"search": "' + this.searchInput + '",' +
-            '"sortPrice": "' + this.sortBy + '"}}'
+            '"sortPrice": "' + this.sortBy + '",' +
+            '"categoryId": ' + selectedCategoryId + '}}'
       });
+      console.log(responce);
       this.sortedBooks = await responce.json();
       this.defaultData = this.sortedBooks;
     },
     toggleSortType() {
       this.sortBy = this.sortBy === "DESC" ? "ASC" : "DESC";
+    },
+    addToCartParent(data) {
+      console.log(data)
+    }
+  },
+  watch: {
+    selectedCategory() {
+      this.sortBooks();
     }
   },
   mounted() {

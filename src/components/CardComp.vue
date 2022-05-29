@@ -34,7 +34,7 @@
                 class="align-self-center"
             >
               <v-btn
-                  class=""
+                  @click="addToCart"
                   elevation="2"
                   color="primary"
                   size="small"
@@ -51,13 +51,31 @@
 <script>
 export default {
   name: "CardComp",
+  data() {
+    return {
+      dataName: this.$props.name,
+      dataAuthorName: this.$props.authorName,
+      dataPrice: this.$props.price,
+      dataCategoryId: this.$props.categoryId
+    }
+  },
   props: {
     name: String,
     authorName: String,
     price: Number,
     coverUrl: String,
     categoryId: Number
-  }
+  },
+  methods: {
+    addToCart() {
+      this.$emit("addToCart", {
+        bookName: this.dataName,
+        bookAuthorName: this.dataAuthorName,
+        bookPrice: this.dataPrice,
+        bookCategoryId: this.dataCategoryId
+      });
+    }
+  },
 }
 </script>
 
