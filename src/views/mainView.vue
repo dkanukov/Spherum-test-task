@@ -42,7 +42,7 @@
               :key="book"
             >
               <card-comp
-                  @addToCart="addToCartParent"
+                  @pushData="addToCart"
                   :name = book.name
                   :author-name = book.authorName
                   :price = book.price
@@ -60,15 +60,75 @@
 
         <v-col class="v-col-4 pt-5">
           <h2 class="books__list">Корзина</h2>
+          <v-card
+              class="mt-5"
+              v-for="book in cart"
+              :key="book.id">
+            <v-row>
+              <v-col class="v-col-8">
+                <v-row>
+                  <v-card-title>{{book.name}}</v-card-title>
+                </v-row>
+                <v-row>
+                  <v-card-text>{{book.numberInCart}} шт.</v-card-text>
+                </v-row>
+                <v-row>
+                  <v-card-title>{{ book.cartDisplayPrice }}</v-card-title>
+                </v-row>
+              </v-col>
+              <v-col class="align-self-center">
+                <v-btn
+                    color="error"
+                    @click="removeFromCart(book.id)"
+                >Удалить</v-btn>
+              </v-col>
+            </v-row>
+
+          </v-card>
+          <v-row>
+            <v-col class="mt-3">
+              <v-divider/>
+              <v-row class="justify-center">
+                <h2 class="mt-5 d-block">{{ totalCartCost }} руб.</h2>
+              </v-row>
+              <v-row class="justify-center">
+                <v-btn
+                    :disabled="totalCartCost === 0"
+                    @click="buyBooks"
+                    color="success"
+                    size="large"
+                    class="mt-5 jusify-center"
+                >
+                  Оформить заказ
+                </v-btn>
+              </v-row>
+
+            </v-col>
+          </v-row>
         </v-col>
       </v-row>
     </v-container>
   </div>
+  <v-alert
+      v-show="alert"
+      type="success"
+      transition="scale-transition"
+  >
+    Покупка прошла успешно!
+  </v-alert>
+  <v-alert
+      v-show="alert_error"
+      type="error"
+      transition="scale-transition"
+  >
+    Недостаточно средств на счету!
+  </v-alert>
 </template>
 
 <script>
 import HeaderComp from "@/components/HeaderComp";
 import CardComp from "@/components/CardComp";
+import {mapGetters, mapMutations} from "vuex";
 export default {
   name: "mainView",
   components: {
@@ -77,6 +137,7 @@ export default {
   },
   data() {
     return {
+      cart: [],
       defaultData: [],
       booksDefaultCategories: [],
       bookCategories: [],
@@ -84,9 +145,12 @@ export default {
       sortBy: "ASC",
       searchInput: "",
       selectedCategory: "",
+      alert: false,
+      alert_error: false,
     }
   },
   methods: {
+    ...mapMutations(["setNewBalance"]),
     async fetchBooks() {
       const responce = await fetch("http://45.8.249.57/bookstore-api/books", {
         headers: {
@@ -97,7 +161,6 @@ export default {
             '"sortPrice": "' + this.sortBy + '"}}'
       });
       this.defaultData = await responce.json();
-      // this.toggleSortType();
     },
     async fetchCategories() {
       const responce = await fetch("http://45.8.249.57/bookstore-api/books/categories", {
@@ -128,8 +191,40 @@ export default {
     toggleSortType() {
       this.sortBy = this.sortBy === "DESC" ? "ASC" : "DESC";
     },
-    addToCartParent(data) {
-      console.log(data)
+    addToCart(data) {
+      if (this.cart.find(book => (book.name === data.name && true) || false)) {
+        const book = this.cart.find(book => book.name === data.name);
+        book.numberInCart += 1;
+        book.cartDisplayPrice = book.price * book.numberInCart;
+      } else {
+        this.cart.push(data);
+      }
+    },
+    removeFromCart(id) {
+      const book = this.cart.find(book => book.id === id);
+      if (book.numberInCart > 1) {
+        book.numberInCart -= 1;
+        book.cartDisplayPrice = book.price * book.numberInCart;
+      } else {
+        this.cart.splice(this.cart.indexOf(book), 1);
+      }
+    },
+    buyBooks() {
+      if (this.getBalance > this.totalCartCost) {
+        console.log("Покупка совершена");
+        this.setNewBalance(this.totalCartCost);
+        this.cart = [];
+        this.alert = true;
+        setTimeout(() => {
+          this.alert = false;
+        }, 3000);
+      } else {
+        console.log("Недостаточно средств");
+        this.alert_error = true;
+        setTimeout(() => {
+          this.alert_error = false;
+        }, 3000);
+      }
     }
   },
   watch: {
@@ -137,7 +232,13 @@ export default {
       this.sortBooks();
     }
   },
-  mounted() {
+  computed: {
+    totalCartCost() {
+      return this.cart.reduce((acc, book) => acc + book.cartDisplayPrice, 0);
+    },
+    ...mapGetters(["getBalance"])
+  },
+  created() {
     this.fetchBooks();
     this.fetchCategories();
   }
@@ -186,5 +287,13 @@ export default {
     height: 40px;
     background-image: url(../assets/mirror.svg);
     bottom: 33px;
+  }
+
+  .v-alert {
+    position: fixed;
+    left: 50%;
+    bottom: 50px;
+    transform: translate(-50%, -50%);
+    margin: 0 auto;
   }
 </style>

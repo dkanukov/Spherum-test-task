@@ -15,7 +15,7 @@
         <v-col class="v-col-8">
           <v-row>
             <v-col>
-              <v-card-title style="overflow-y: auto; overflow-x: auto; height:120px">
+              <v-card-title style="overflow-y: auto; overflow-x: auto; height:150px">
                 <p>{{name}}</p>
               </v-card-title>
             </v-col>
@@ -56,7 +56,8 @@ export default {
       dataName: this.$props.name,
       dataAuthorName: this.$props.authorName,
       dataPrice: this.$props.price,
-      dataCategoryId: this.$props.categoryId
+      dataCategoryId: this.$props.categoryId,
+      numberInCart: 1
     }
   },
   props: {
@@ -68,11 +69,13 @@ export default {
   },
   methods: {
     addToCart() {
-      this.$emit("addToCart", {
-        bookName: this.dataName,
-        bookAuthorName: this.dataAuthorName,
-        bookPrice: this.dataPrice,
-        bookCategoryId: this.dataCategoryId
+      this.$emit("pushData", {
+        name: this.dataName,
+        authorName: this.dataAuthorName,
+        price: this.dataPrice,
+        categoryId: this.dataCategoryId,
+        numberInCart: this.numberInCart,
+        cartDisplayPrice: this.price
       });
     }
   },

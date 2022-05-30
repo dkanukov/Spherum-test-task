@@ -10,7 +10,7 @@
         </v-col>
         <v-spacer/>
         <v-col class="v-col-5 v-col-md-3 v-col-lg-3">
-          <h3>Баланс: {{balance}}</h3>
+          <h3>Баланс: {{getBalance}}</h3>
         </v-col>
       </v-row>
     </v-container>
@@ -19,12 +19,11 @@
 </template>
 
 <script>
+import {mapGetters} from 'vuex';
 export default {
   name: "HeaderComp",
-  data() {
-    return {
-      balance: 900
-    }
+  computed: {
+    ...mapGetters(["getBalance"])
   },
 }
 </script>
