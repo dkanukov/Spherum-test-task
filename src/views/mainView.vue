@@ -2,11 +2,11 @@
   <div>
     <HeaderComp/>
     <v-container fluid>
-      <v-row class="d-none d-sm-block">
+      <v-row class="d-none d-md-flex">
 
         <v-col class="v-col-6">
           <v-row class="justify-sm-space-between">
-            <v-col class="align-self-center v-col-xs-4 v-col-sm-5 v-col-md-4 v-col-lg-4">
+            <v-col class="align-self-center v-col-md-7 v-col-lg-7">
               <h3
                 class="pb-5 sort__btn"
                 @click="toggleSortType(); sortBooks()"
@@ -14,7 +14,7 @@
                 Сортировка по цене
               </h3>
             </v-col>
-            <v-col class="align-self-center v-col-5 v-col-sm-5">
+            <v-col class="align-self-center v-col-5 ">
               <v-select
                   :items="booksDefaultCategories"
                   item-title="name"
@@ -97,7 +97,7 @@
                     @click="buyBooks"
                     color="success"
                     size="large"
-                    class="mt-5 jusify-center"
+                    class="mt-5"
                 >
                   Оформить заказ
                 </v-btn>
@@ -110,16 +110,117 @@
 
 <!--      for extra-small devices-->
 
+    <div class="d-block d-md-none">
       <v-row>
-          <h3
-              @click="toggleSortType(); sortBooks()"
-          >
-            Сортировка по цене</h3>
-        <v-icon color="orange">
-          mdiArrowUpDown
-        </v-icon>
+        <h3
+            class="sort__btn__xs"
+            @click="toggleSortType(); sortBooks()"
+        >
+          Сортировка по цене</h3>
       </v-row>
 
+      <v-row class="mt-5">
+        <v-select
+            :items="booksDefaultCategories"
+            item-title="name"
+            label="Категория"
+            v-model="selectedCategory"
+            return-object
+        />
+      </v-row>
+
+      <v-row>
+        <v-col class="v-col-12">
+          <v-text-field
+              class="search__field__xs"
+              v-model.trim="searchInput"
+              @input="sortBooks"
+          />
+        </v-col>
+      </v-row>
+
+      <v-row v-if="defaultData.length !== 0">
+        <v-col class="v-col-12">
+          <v-row
+              class="justify-center"
+              v-for="book in defaultData"
+              :key="book"
+          >
+            <v-col class="v-col-12 mt-5">
+              <card-comp
+                  @pushData="addToCart"
+                  :name = book.name
+                  :author-name = book.authorName
+                  :price = book.price
+                  :cover-url = book.coverUrl
+                  :category-id = book.categoryId
+              />
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+
+      <v-row v-else class="justify-center">
+        <v-col>
+          <h1>Мы не смогли ничего найти :(</h1>
+        </v-col>
+
+      </v-row>
+
+      <v-row class="mt-5">
+        <v-col class="v-col-12">
+          <h2 class="books__list">Корзина</h2>
+          <v-row
+              style="max-width: 400px"
+              class="mt-5 border"
+              v-for="book in cart"
+              :key="book.id">
+              <v-col class="v-col-12">
+                <v-row>
+                  <h5 class="d-block">{{book.name}}</h5>
+                </v-row>
+                <v-row class="mt-5">
+                  <p class="d-block">{{book.numberInCart}} шт.</p>
+                </v-row>
+                <v-row class="mt-5">
+                  <p class="d-block">{{book.cartDisplayPrice}} руб.</p>
+                </v-row>
+
+              </v-col>
+
+
+
+
+
+          </v-row>
+          <v-row>
+            <v-col class="mt-3">
+              <v-divider/>
+              <v-row class="justify-center">
+                <h2 class="mt-5 d-block">{{ totalCartCost }} руб.</h2>
+              </v-row>
+              <v-row class="justify-center">
+                <v-btn
+                    :disabled="totalCartCost === 0"
+                    @click="buyBooks"
+                    color="success"
+                    size="small"
+                    class="mt-5"
+                >
+                  Оформить заказ
+                </v-btn>
+              </v-row>
+
+            </v-col>
+          </v-row>
+        </v-col>
+      </v-row>
+
+
+
+
+
+    </div>
     </v-container>
   </div>
   <v-alert
@@ -142,7 +243,6 @@
 import HeaderComp from "@/components/HeaderComp";
 import CardComp from "@/components/CardComp";
 import {mapGetters, mapMutations} from "vuex";
-import { mdiArrowUpDown } from '@mdi/js';
 export default {
   name: "mainView",
   components: {
@@ -277,11 +377,11 @@ export default {
     position: absolute;
     content: "";
     bottom: 0;
-    width: 40px;
-    height: 40px;
+    width: 16px;
+    height: 16px;
     background-image: url(../assets/arrows.svg);
-    right: 0;
-    left: 150px;
+    top: 8px;
+    right: 320px;
   }
 
   .books__list {
@@ -295,7 +395,7 @@ export default {
     width: 40px;
     height: 40px;
     background-image: url(../assets/bucket.svg);
-    right: -120px;
+    top: 5px;
   }
 
   .search__field {
@@ -318,4 +418,32 @@ export default {
     transform: translate(-50%, -50%);
     margin: 0 auto;
   }
+  .sort__btn__xs {
+    position: relative;
+  }
+
+  .sort__btn__xs::after {
+    position: absolute;
+    content: "";
+    bottom: 0;
+    width: 16px;
+    height: 16px;
+    background-image: url(../assets/arrows.svg);
+    right: -30px;
+    bottom: 5px;
+  }
+
+  .search__field__xs {
+    position: relative;
+  }
+
+  .search__field__xs::before {
+    position: absolute;
+    content: "";
+    width: 16px;
+    height: 16px;
+    background-image: url(../assets/mirror.svg);
+    bottom: 50px;
+  }
+
 </style>
