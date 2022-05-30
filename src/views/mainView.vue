@@ -283,7 +283,6 @@ export default {
       this.booksDefaultCategories = await responce.json();
     },
     async sortBooks() {
-      console.log(this.sortBy)
       let selectedCategoryId = 0;
       if (this.selectedCategory !== "") {
         selectedCategoryId = this.booksDefaultCategories.find(category => category.name === this.selectedCategory).id;
@@ -298,7 +297,6 @@ export default {
             '"sortPrice": "' + this.sortBy + '",' +
             '"categoryId": ' + selectedCategoryId + '}}'
       });
-      console.log(responce);
       this.sortedBooks = await responce.json();
       this.defaultData = this.sortedBooks;
     },
