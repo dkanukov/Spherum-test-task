@@ -199,6 +199,7 @@ export default {
       } else {
         this.cart.push(data);
       }
+      localStorage.setItem("cart", JSON.stringify(this.cart));
     },
     removeFromCart(id) {
       const book = this.cart.find(book => book.id === id);
@@ -208,6 +209,7 @@ export default {
       } else {
         this.cart.splice(this.cart.indexOf(book), 1);
       }
+      localStorage.setItem("cart", JSON.stringify(this.cart));
     },
     buyBooks() {
       if (this.getBalance > this.totalCartCost) {
@@ -215,6 +217,7 @@ export default {
         this.setNewBalance(this.totalCartCost);
         this.cart = [];
         this.alert = true;
+        localStorage.setItem("cart", JSON.stringify(this.cart));
         setTimeout(() => {
           this.alert = false;
         }, 3000);
@@ -241,6 +244,9 @@ export default {
   created() {
     this.fetchBooks();
     this.fetchCategories();
+    if (localStorage.getItem("cart")) {
+      this.cart = JSON.parse(localStorage.getItem("cart"));
+    }
   }
 }
 </script>
