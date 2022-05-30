@@ -7,7 +7,7 @@ export default {
     },
     mutations: {
         setNewBalance: (state, payload) => {
-            state.balance = state.balance - payload;
+            state.balance = payload;
         }
     }
 }

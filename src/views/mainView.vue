@@ -213,8 +213,7 @@ export default {
     },
     buyBooks() {
       if (this.getBalance > this.totalCartCost) {
-        console.log("Покупка совершена");
-        this.setNewBalance(this.totalCartCost);
+        this.setNewBalance(this.getBalance - this.totalCartCost);
         this.cart = [];
         this.alert = true;
         localStorage.setItem("cart", JSON.stringify(this.cart));
@@ -222,12 +221,12 @@ export default {
           this.alert = false;
         }, 3000);
       } else {
-        console.log("Недостаточно средств");
         this.alert_error = true;
         setTimeout(() => {
           this.alert_error = false;
         }, 3000);
       }
+      localStorage.setItem("balance", JSON.stringify(this.getBalance));
     }
   },
   watch: {
@@ -246,6 +245,9 @@ export default {
     this.fetchCategories();
     if (localStorage.getItem("cart")) {
       this.cart = JSON.parse(localStorage.getItem("cart"));
+    }
+    if (localStorage.getItem("balance")) {
+      this.setNewBalance(JSON.parse(localStorage.getItem("balance")));
     }
   }
 }
