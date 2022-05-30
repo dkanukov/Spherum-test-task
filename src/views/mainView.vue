@@ -2,7 +2,7 @@
   <div>
     <HeaderComp/>
     <v-container fluid>
-      <v-row>
+      <v-row class="d-none d-sm-block">
 
         <v-col class="v-col-6">
           <v-row class="justify-sm-space-between">
@@ -11,7 +11,7 @@
                 class="pb-5 sort__btn"
                 @click="toggleSortType(); sortBooks()"
               >
-                Сортировка цен
+                Сортировка по цене
               </h3>
             </v-col>
             <v-col class="align-self-center v-col-5 v-col-sm-5">
@@ -107,6 +107,19 @@
           </v-row>
         </v-col>
       </v-row>
+
+<!--      for extra-small devices-->
+
+      <v-row>
+          <h3
+              @click="toggleSortType(); sortBooks()"
+          >
+            Сортировка по цене</h3>
+        <v-icon color="orange">
+          mdiArrowUpDown
+        </v-icon>
+      </v-row>
+
     </v-container>
   </div>
   <v-alert
@@ -129,6 +142,7 @@
 import HeaderComp from "@/components/HeaderComp";
 import CardComp from "@/components/CardComp";
 import {mapGetters, mapMutations} from "vuex";
+import { mdiArrowUpDown } from '@mdi/js';
 export default {
   name: "mainView",
   components: {
